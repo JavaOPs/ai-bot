@@ -1,1 +1,8 @@
 BOT_HTTP_API_Token: BOT_HTTP_API_Token
+YANDEX_CLOUD_MODEL: qwen3-235b-a22b-fp8/latest
+
+spring.ai.openai:
+  base-url: https://ai.api.cloud.yandex.net
+  api-key: ${YANDEX_CLOUD_API_KEY}
+  chat.organization-id: ${YANDEX_CLOUD_FOLDER}
+  chat.options.model: "gpt://${YANDEX_CLOUD_FOLDER}/${YANDEX_CLOUD_MODEL}"

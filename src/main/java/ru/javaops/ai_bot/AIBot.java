@@ -2,12 +2,14 @@ package ru.javaops.ai_bot;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import ru.javaops.ai_bot.ai.ChatService;
 import ru.javaops.ai_bot.handler.ClientHandler;
 import ru.javaops.ai_bot.handler.CommandHandler;
 import ru.javaops.ai_bot.handler.UpdateHandler;
@@ -16,6 +18,7 @@ import static ru.javaops.ai_bot.AIBot.Stage.*;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AIBot implements LongPollingSingleThreadUpdateConsumer {
 
     private static final String START_JAVA_COURSE = "Java for beginners: [StartJava](https://javaops.ru/view/startjava?ref=aibot)";
@@ -26,6 +29,8 @@ public class AIBot implements LongPollingSingleThreadUpdateConsumer {
             Main are [Microservices, Kafka, Docker, Spring Cloud, reactive stack](https://javaops.ru/view/cloudjava?ref=aibot)
             and [Deploy microservices to Kubernetes. Helm](https://javaops.ru/view/cloudjava2?ref=aibot)
             """;
+
+    private final ChatService chatService;
 
     @Value("${BOT_HTTP_API_Token}")
     @Getter
@@ -105,7 +110,8 @@ public class AIBot implements LongPollingSingleThreadUpdateConsumer {
     }
 
     private void finish(long tgId, String course) {
-        clientHandler.sendMd(tgId, "Have a look at " + course);
+        String answer = chatService.generateAnswer("Тест");
+        clientHandler.sendMd(tgId, "Have a look at " + course + '\n' + answer);
         states.invalidate(tgId);
     }
 }
