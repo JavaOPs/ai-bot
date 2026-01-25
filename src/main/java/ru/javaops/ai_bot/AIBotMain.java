@@ -9,7 +9,7 @@ public class AIBotMain {
         String botToken = "BOT_HTTP_API_Token";
         // https://rubenlagus.github.io/TelegramBotsDocumentation/getting-started.html
         try (TelegramBotsLongPollingApplication botsApp = new TelegramBotsLongPollingApplication()) {
-            botsApp.registerBot(botToken, new AIBot());
+            botsApp.registerBot(botToken, new AIBot(botToken));
             log.info("Bot registered");
             Thread.currentThread().join();  // wait
         }
