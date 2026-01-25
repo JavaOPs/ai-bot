@@ -1,19 +1,37 @@
 package ru.javaops.ai_bot.handler;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import ru.javaops.ai_bot.error.TelegramException;
+import ru.javaops.ai_bot.util.Util;
 
 import java.util.List;
+
+import static ru.javaops.ai_bot.handler.KeyboardHandler.createInlineButton;
 
 @UtilityClass
 public class UpdateHandler {
 
+    public static final String YES = "yes";
+    public static final String NO = "no";
+    public static final InlineKeyboardMarkup YES_NO_KEYBOARD = KeyboardHandler.createSingleRowMarkup(
+            createInlineButton("Yes", YES),
+            createInlineButton("No", NO));
+
     public static Message getMessage(Update upd) {
         return upd.hasMessage() ? upd.getMessage() : upd.getEditedMessage();
+    }
+
+    @NonNull
+    public static String getDataFromCallbackQuery(Update upd) {
+        CallbackQuery callbackQuery = Util.notNull(upd.getCallbackQuery(), "update has no CallbackQuery");
+        return Util.notNull(callbackQuery.getData(), "callbackQuery has no Date");
     }
 
     //    from org.telegram.abilitybots.api.util.AbilityUtils (https://github.com/rubenlagus/TelegramBots/tree/master/telegrambots-abilities)
