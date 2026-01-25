@@ -24,7 +24,7 @@ public class AIBot implements LongPollingSingleThreadUpdateConsumer {
         Message message = UpdateHandler.getMessage(update);
         if (message != null) {
             // tg_id==chat_id for bot-user chat (https://stackoverflow.com/a/42786449/548473)
-            clientHandler.send(from.getId(), message.getText());
+            clientHandler.sendMd(from.getId(), message.getText());
         }
     }
 }
