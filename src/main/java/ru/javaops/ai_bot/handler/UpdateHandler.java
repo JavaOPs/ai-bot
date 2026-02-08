@@ -1,10 +1,13 @@
 package ru.javaops.ai_bot.handler;
 
 import lombok.experimental.UtilityClass;
+import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import ru.javaops.ai_bot.error.TelegramException;
+
+import java.util.List;
 
 @UtilityClass
 public class UpdateHandler {
@@ -76,5 +79,50 @@ public class UpdateHandler {
         } else {
             throw new TelegramException("Could not retrieve originating user from update");
         }
+    }
+
+    public static String recoverMarkdown(Message message) {
+        String text = message.getText();
+        List<MessageEntity> entities = message.getEntities();
+
+        if (text == null || entities == null || entities.isEmpty()) {
+            return text; // Return plain text if no entities
+        }
+
+        // We need to process entities in reverse order of their offsets
+        // to avoid messing up the string indices when inserting markdown symbols
+        entities.sort((e1, e2) -> e2.getOffset() - e1.getOffset());
+        StringBuilder markdownBuilder = new StringBuilder(text);
+
+        for (MessageEntity entity : entities) {
+            int offset = entity.getOffset();
+            int length = entity.getLength();
+
+            switch (entity.getType()) {
+                case "bold":
+                    markdownBuilder.insert(offset + length, "*");
+                    markdownBuilder.insert(offset, "*");
+                    break;
+                case "italic":
+                    markdownBuilder.insert(offset + length, "_");
+                    markdownBuilder.insert(offset, "_");
+                    break;
+                case "code":
+                    markdownBuilder.insert(offset + length, "`");
+                    markdownBuilder.insert(offset, "`");
+                    break;
+                case "pre":
+                    markdownBuilder.insert(offset + length, "```");
+                    markdownBuilder.insert(offset, "```");
+                    break;
+                case "text_link":
+                    String url = entity.getUrl();
+                    markdownBuilder.insert(offset + length, "](" + url + ")");
+                    markdownBuilder.insert(offset, "[");
+                    break;
+                // Add other entity types as needed
+            }
+        }
+        return markdownBuilder.toString();
     }
 }
