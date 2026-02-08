@@ -1,6 +1,10 @@
 package ru.javaops.ai_bot;
 
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -11,6 +15,7 @@ import ru.javaops.ai_bot.handler.UpdateHandler;
 import static ru.javaops.ai_bot.AIBot.Stage.*;
 
 @Slf4j
+@Component
 public class AIBot implements LongPollingSingleThreadUpdateConsumer {
 
     private static final String START_JAVA_COURSE = "Java for beginners: [StartJava](https://javaops.ru/view/startjava?ref=aibot)";
@@ -22,7 +27,11 @@ public class AIBot implements LongPollingSingleThreadUpdateConsumer {
             and [Deploy microservices to Kubernetes. Helm](https://javaops.ru/view/cloudjava2?ref=aibot)
             """;
 
-    protected final ClientHandler clientHandler;
+    @Value("${BOT_HTTP_API_Token}")
+    @Getter
+    String token;
+
+    protected ClientHandler clientHandler;
     protected final States<Stage> states = new States<>();
 
     public enum Stage {
@@ -30,11 +39,13 @@ public class AIBot implements LongPollingSingleThreadUpdateConsumer {
         HANDLE_BASE_PROGRAM_QUESTION,
         HANDLE_BASE_TEST_QUESTION,
         HANDLE_TOP_PROGRAM_QUESTION,
-        HANDLE_TOP_TEST_QUESTION;
+        HANDLE_TOP_TEST_QUESTION
     }
 
-    public AIBot(String botToken) {
-        clientHandler = new ClientHandler(botToken);
+
+    @PostConstruct
+    public void init() {
+        clientHandler = new ClientHandler(token);
     }
 
     @Override
