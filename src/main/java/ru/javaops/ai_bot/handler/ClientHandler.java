@@ -3,6 +3,7 @@ package ru.javaops.ai_bot.handler;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.client.jetty.JettyTelegramClient;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import ru.javaops.ai_bot.error.TelegramException;
@@ -28,6 +29,13 @@ public class ClientHandler {
     //    https://developers.sinch.com/docs/conversation/channel-support/telegram/markdown/#markdown-syntax-on-the-telegram-bot-channel
     public void sendMd(long tgId, String txt) {
         send0(tgId, txt, msg -> msg.enableMarkdown(true));
+    }
+
+    public void sendMdAndKeyboard(long tgId, String txt, ReplyKeyboard keyboard) {
+        send0(tgId, txt, msg -> {
+            msg.enableMarkdown(true);
+            msg.setReplyMarkup(keyboard);
+        });
     }
 
     public void send0(long tgId, String txt, Consumer<SendMessage> consumer) {
