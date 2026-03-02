@@ -28,6 +28,14 @@ public class UpdateHandler {
         return upd.hasMessage() ? upd.getMessage() : upd.getEditedMessage();
     }
 
+    public static void treatNoAndYes(Update update, Runnable treatNo, Runnable treatYes) {
+        String cbData = getDataFromCallbackQuery(update);
+        switch (cbData) {
+            case NO -> treatNo.run();
+            case YES -> treatYes.run();
+        }
+    }
+
     @NonNull
     public static String getDataFromCallbackQuery(Update upd) {
         CallbackQuery callbackQuery = Util.notNull(upd.getCallbackQuery(), "update has no CallbackQuery");
